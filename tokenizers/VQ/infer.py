@@ -1,6 +1,34 @@
 import torch
 import numpy as np
 from model import SimpleVQVAE
+import matplotlib.pyplot as plt
+
+def save_reconstruction_plot(original, reconstructed, save_path="reconstruction_comparison.png", plot_len=1000):
+    """
+    绘制并保存原始信号与重建信号的对比图
+    """
+    # 确保绘制长度不超过数据实际长度
+    actual_len = min(plot_len, len(original))
+    
+    plt.figure(figsize=(15, 6))
+    
+    # 绘制原始信号
+    plt.plot(original[:actual_len], label='Original Signal', alpha=0.7, color='blue')
+    
+    # 绘制重建信号
+    plt.plot(reconstructed[:actual_len], label='Reconstructed Signal', alpha=0.7, color='red', linestyle='--')
+    
+    plt.title(f"Signal Reconstruction Comparison (First {actual_len} samples)")
+    plt.xlabel("Sample Index")
+    plt.ylabel("Amplitude")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    
+    # 保存图片
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.close() # 关闭画板释放内存
+    print(f"\n[成功] 对比图已保存为: {save_path}")
 
 def infer():
     # 1. 配置
@@ -53,6 +81,7 @@ def infer():
         recon_chunk = recon[0, 0].cpu().numpy()
         print("\n--- [重建数据预览 (前 10 个采样点)] ---")
         print(recon_chunk[:10])
-
+    # 7. 调用绘图函数
+    save_reconstruction_plot(input_chunk, recon_chunk)
 if __name__ == "__main__":
     infer()
